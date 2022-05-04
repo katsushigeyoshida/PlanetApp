@@ -1,0 +1,23 @@
+﻿<Window x:Class="PlanetApp.StarDataListView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PlanetApp"
+        mc:Ignorable="d"
+        Title="StarDataList" Height="450" Width="500" Loaded="Window_Loaded" LayoutUpdated="Window_LayoutUpdated" Closing="Window_Closing">
+    <DockPanel>
+        <StatusBar DockPanel.Dock="Top">
+            <ComboBox Name="CbMenu" Width="150" SelectionChanged="CbMenu_SelectionChanged"  />
+            <ComboBox Name="CbDataFIleList" Width="150" SelectionChanged="CbDataFIleList_SelectionChanged" />
+            <TextBox x:Name="TbSearchText" Width="120" />
+            <Button x:Name="BtSearch" Content="検索" Width="40" Click="BtSearch_Click"  />
+        </StatusBar>
+        <StatusBar DockPanel.Dock="Bottom" >
+            <TextBlock x:Name="TbStatus" />
+        </StatusBar>
+        <DataGrid x:Name="DgStarData" IsReadOnly="True" MouseDoubleClick="DgStarData_MouseDoubleClick" >
+            
+        </DataGrid>
+    </DockPanel>
+</Window>

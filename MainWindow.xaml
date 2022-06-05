@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PlanetApp"
         mc:Ignorable="d"
-        Title="MainWindow" Height="700" Width="850" Loaded="Window_Loaded" LayoutUpdated="Window_LayoutUpdated" Closing="Window_Closing">
+        Title="MainWindow" Height="700" Width="900" Loaded="Window_Loaded" LayoutUpdated="Window_LayoutUpdated" Closing="Window_Closing">
     <DockPanel >
         <StatusBar Name="SbTopStatusBar" DockPanel.Dock="Top" Height="30" >
             <ComboBox Name="CbMenu" Width="80" SelectionChanged="CbMenu_SelectionChanged" />
@@ -20,6 +20,8 @@
             <CheckBox x:Name="ChConstellaName" Content="星座名" Click="ChConstellaName_Click"   />
             <CheckBox x:Name="CbNebula" Content="星雲・銀河" Click="CbNebula_Click" />
             <CheckBox x:Name="CbPlanet" Content="惑星" Click="CbPlanet_Click" />
+            <!--<CheckBox x:Name="CbMilkyway" Content="天の川" Click="CbMilkyway_Click" />-->
+            <ComboBox Name="CbMilkyway" Width="60" SelectionChanged="CbMilkyway_SelectionChanged" />
             <TextBlock Text="　観測位置"/>
             <ComboBox Name="CbLocation" Width="60" SelectionChanged="CbLocation_SelectionChanged" />
         </StatusBar>

@@ -16,22 +16,22 @@ Web上にある恒星データや理科年表、天文年鑑に載っている�
 
 
 起動画面 (東西南北表示)  
-<img src="images/MainWindow.png" width="50%">  
+<img src="Images/MainWindow.png" width="50%">  
 
 全天表示  
-<img src="images/全天表示.png" width="50%">  
+<img src="Images/全天表示.png" width="50%">  
 
 星座早見盤型式の表示  
-<img src="images/星座早見盤表示.png" width="50%">  
+<img src="Images/星座早見盤表示.png" width="50%">  
 
 恒星データの表示  
-<img src="images/恒星データ表示.png" width="50%">  
+<img src="Images/恒星データ表示.png" width="50%">  
 
 表示中の恒星データの地平座標の表示  
-<img src="images/地平座標データ.png" width="50%">  
+<img src="Images/地平座標データ.png" width="50%">  
 
 太陽系惑星の軌道表示  
-<img src="images/太陽系の惑星表示.png" width="50%">  
+<img src="Images/太陽系の惑星表示.png" width="50%">  
 太陽系の惑星の軌道を地球を中心にして表示  
 <img src="images/地球中心の太陽系表示.png" width="50%">  
 Wikipediaの天体に関する情報の取得と表示  

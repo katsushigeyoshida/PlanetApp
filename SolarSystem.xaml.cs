@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace PlanetApp
 {
@@ -23,7 +24,7 @@ namespace PlanetApp
         private string[] mPlanetType = { 
             "太陽中心軌道", "地球中心軌道" };
         private string[] mStepDayTutle = { 
-            "ステップ日数", "1日", "5日", "10日", "20日", "30日" };
+            "ステップ日数", "1日", "2日", "3日", "5日", "10日", "20日", "30日" };
         private string[] mPlanetName = {
             "水星", "金星", "地球", "火星", "木星", "土星", "天王星", "海王星"
         };
@@ -32,12 +33,15 @@ namespace PlanetApp
             Brushes.Chocolate, Brushes.Yellow, Brushes.Aqua, Brushes.DarkBlue
         };
         private DateTime mDateTime;                             //  表示日時
-        private int mDateIncrimentSize = 5;                     //  1クリックの更新日数
+        private int mDateIncrimentSize = 3;                     //  1クリックの更新日数
         private double mRoollX = 0;                             //  X軸の回転角度(deg)
         private double mRoollY = 0;                             //  X軸の回転角度(deg)
         private bool mPtolemaic = false;                        //  天動説(地球中心)表示
         private List<List<Point3D>> mPtlemaicList;              //  惑星の軌跡データ
 
+        private DispatcherTimer dispatcherTimer;                //  惑星運行の自動実行
+        private int mSecInterval = 0;                           //  自動実行時のインターバル秒
+        private int mMiliInterval = 300;                        //  自動実行時のインターバルm秒
         private PointD mLeftPressPoint = new PointD();          //  マウス左ボタン位置
 
         private PlanetLib plib = new PlanetLib();               //  惑星データ
@@ -59,6 +63,10 @@ namespace PlanetApp
             CbDispType.SelectedIndex = 0;
             CbStepDays.ItemsSource = mStepDayTutle;
             CbStepDays.SelectedIndex = 0;
+            //  タイマーインスタンスの作成
+            dispatcherTimer = new DispatcherTimer(DispatcherPriority.Normal);
+            dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
+
             //  地心軌道の軌跡データの初期化
             ptolemaicInit();
         }
@@ -137,6 +145,41 @@ namespace PlanetApp
             Properties.Settings.Default.Save();
         }
 
+
+        /// <summary>
+        /// 自動実行開始
+        /// </summary>
+        private void timerStart()
+        {
+            if (!dispatcherTimer.IsEnabled) {
+                dispatcherTimer.Interval = new TimeSpan(0, 0, 0, mSecInterval, mMiliInterval);
+                dispatcherTimer.Start();
+            }
+        }
+
+        /// <summary>
+        /// 自動実行停止
+        /// </summary>
+        private void timerStop()
+        {
+            if (dispatcherTimer.IsEnabled) {
+                dispatcherTimer.Stop();
+            }
+        }
+
+        /// <summary>
+        /// タイマー割込みで惑星の位置を進める
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void dispatcherTimer_Tick(object sender, EventArgs e)
+        {
+            //throw new NotImplementedException();
+            mDateTime = mDateTime.AddDays(mDateIncrimentSize);
+            DpSolarDate.SelectedDate = mDateTime;
+            drawSolarSystem(false, new PointD());
+        }
 
         /// <summary>
         /// [マウスホィール]
@@ -237,11 +280,21 @@ namespace PlanetApp
                 mDateTime = mDateTime.AddDays(mDateIncrimentSize);
                 DpSolarDate.SelectedDate = mDateTime;
                 drawSolarSystem(false, new PointD());
-            } else if (bt.Name.CompareTo("BtDateNow") == 0) {       //  現在時刻く
-                mDateTime = DateTime.Now;
-                DpSolarDate.SelectedDate = mDateTime;
-                ptolemaicInit();
-                drawSolarSystem(false, new PointD());
+            } else if (bt.Name.CompareTo("BtPlay") == 0) {          //  自動実行開始
+                if (!dispatcherTimer.IsEnabled) {
+                    timerStart();
+                }
+            } else if (bt.Name.CompareTo("BtDateNow") == 0) {       //  停止/現在時刻
+                if (dispatcherTimer.IsEnabled) {
+                    //  自動実行停止
+                    timerStop();
+                } else {
+                    //  現在時刻の位置に設定
+                    mDateTime = DateTime.Now;
+                    DpSolarDate.SelectedDate = mDateTime;
+                    ptolemaicInit();
+                    drawSolarSystem(false, new PointD());
+                }
             } else if (bt.Name.CompareTo("BtDateDown") == 0) {      //  戻す
                 mDateTime = mDateTime.AddDays(-mDateIncrimentSize);
                 DpSolarDate.SelectedDate = mDateTime;

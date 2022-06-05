@@ -33,7 +33,7 @@ Web上にある恒星データや理科年表、天文年鑑に載っている�
 太陽系惑星の軌道表示  
 <img src="Images/太陽系の惑星表示.png" width="50%">  
 太陽系の惑星の軌道を地球を中心にして表示  
-<img src="images/地球中心の太陽系表示.png" width="50%">  
+<img src="Images/地球中心の太陽系表示.png" width="50%">  
 Wikipediaの天体に関する情報の取得と表示  
 <img src="Images/WikiList表示.png" width="50%">  
 

@@ -51,7 +51,7 @@ namespace PlanetApp
         public bool loadOrgStarData(string filePath)
         {
             mOrgStarTableTitle = Path.GetFileNameWithoutExtension(filePath);    //  テーブル名
-            List<string[]> starDataList = alib.loadData(filePath);                   //  データの読込
+            List<string[]> starDataList = alib.loadData(filePath);              //  データの読込
             mOrgStarStrData = starDataList;
             return mOrgStarStrData.Count < 1 ? false : true;
         }

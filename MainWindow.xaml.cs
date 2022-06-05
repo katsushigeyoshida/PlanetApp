@@ -34,6 +34,7 @@ namespace PlanetApp
         private ConstellationData mConstellationData;           //  星座データ
         private StarInfoData mStarInfoData;                     //  恒星情報データ
         private NebulaData mNebulaData;                         //  星雲、銀河など
+        private Milkyway mMilkywayData;                         //  天の川データ
 
         private DateTime mDateTime;                             //  表示日時
         private double mLocalLatitude = 35.6581;                //  観測点の緯度(東京)
@@ -50,6 +51,7 @@ namespace PlanetApp
         private double mStarRadiusRate = 3.0;                   //  恒星の表示サイズ比率
         private double mScaleTextSize = 18.0;                   //  目盛りの文字サイズ
         private double mScaleLargeTextSize = 25.0;              //  目盛りの文字サイズ大
+        private int mMilkywayDispDinsity = 50;                  //  天の川表示濃度
         private Brush mBaseBackColor = Brushes.White;           //  全体の背景色
         private Brush mBackGroundColor = Brushes.Cyan;          //  背景色
         private Brush mBackGroundBorderColor = Brushes.Black;   //  背景の境界色
@@ -68,8 +70,8 @@ namespace PlanetApp
         private Brush mConstellaLineColor = Brushes.LightSteelBlue;       //  星座線の色
         private Brush mMarckColor = Brushes.Red;                //  恒星マークの色
 
-
-        private int mDispPlanetType = 1;                        //  表示方式(天球/半球)
+        enum DISPPLANETTYPE { CELESTIAL, HALFHORIZONTAL, FULLHORIZONTAL }   //  天球,地平半球,地平全天
+        private DISPPLANETTYPE mDispPlanetType = DISPPLANETTYPE.HALFHORIZONTAL; //  表示方式(天球/半球)
         private string[] mOpeMenu = {
             "操作メニュー", "北面表示", "東面表示", "南面表示", "西面表示", "全天表示",
             "星座早見盤", "恒星データ", "地平座標データ", "WikiLIst", "太陽系", "恒星データリスト更新"
@@ -85,10 +87,15 @@ namespace PlanetApp
         private bool mConstellaName = false;                    //  星座名表示フラグ
         private bool mNebulaName = false;                       //  星雲・銀河などの表示フラグ
         private bool mPlanet = false;                           //  惑星表示フラグ
-        public int mMarkStarData = -1;                         //  
+        private bool mMilkyway = false;                         //  天の川表示フラグ
+        public int mMarkStarData = -1;                          //  リストで選択した恒星No(十字マーク表示)
 
         private string[] mPlanetName = {
             "水星", "金星", "地球", "火星", "木星", "土星", "天王星", "海王星"
+        };
+        private Brush[] mPlanetColor = {
+            Brushes.Silver, Brushes.Gold, Brushes.Blue, Brushes.Magenta,
+            Brushes.Chocolate, Brushes.Yellow, Brushes.Aqua, Brushes.DarkBlue
         };
 
         private bool mColenderChange = true;                    //  カレンダ変更の有効/無効
@@ -103,11 +110,12 @@ namespace PlanetApp
             new PointD(26.21308, 127.67806),                    //  那覇
         };
         private string mLocation = "東京";
+        private string mAppName = "PlanetApp";
 
         private StarDataListView mStarDataListDialog;
         private StarDataListView mDispStarDataListDialog;
         private WikiList mWikiListDialog;                       //  Wikipedia検索ダイヤログ
-        private SolarSystem mSoloarSystem;
+        private SolarSystem mSoloarSystem;                      //  太陽系ウィンドウ
 
         private AstroLib alib = new AstroLib();                 //  天体計算、データ処理ライブラリ
         private PlanetLib plib = new PlanetLib();               //  惑星データ
@@ -135,6 +143,7 @@ namespace PlanetApp
             mConstellationData = new ConstellationData(mAppFolder, mDataFolder);
             mStarInfoData = new StarInfoData(mAppFolder, mDataFolder);
             mNebulaData = new NebulaData(mAppFolder, mDataFolder);
+            mMilkywayData = new Milkyway(mAppFolder, mDataFolder);
 
             //  恒星データの読込
             loadStarData(mStarDataPath);
@@ -142,6 +151,8 @@ namespace PlanetApp
             loadConstellationData();
             //  星雲、銀河データ
             loadNebulaData();
+            //  天の川データ
+            loadMilkywayData();
 
             //  日時データの設定
             setDateMenu();
@@ -158,6 +169,13 @@ namespace PlanetApp
             for (int m = 0; m < 60; m++)
                 CbMinute.Items.Add(m.ToString("#分"));
             setDateMenu();
+            //  天の川の表示レベル設定
+            CbMilkyway.Items.Clear();
+            CbMilkyway.Items.Add("天の川");
+            for (int i = 100; 0 <= i; i -= 10)
+                CbMilkyway.Items.Add(i.ToString());
+            CbMilkyway.SelectedIndex = 0;
+
             //  表示等級
             CbMaxStarName.ItemsSource = mMaxStarName;
             CbMinStarName.ItemsSource = mMinStarName;
@@ -272,30 +290,30 @@ namespace PlanetApp
                         break;
                     case 1:         //  北面表示
                         mDirection = 12;
-                        mDispPlanetType = 1;
+                        mDispPlanetType = DISPPLANETTYPE.HALFHORIZONTAL;
                         drawPlanet(true, new PointD());
                         break;
                     case 2:         //  東面表示
                         mDirection = 18;
-                        mDispPlanetType = 1;
+                        mDispPlanetType = DISPPLANETTYPE.HALFHORIZONTAL;
                         drawPlanet(true, new PointD());
                         break;
                     case 3:         //  南面表示
                         mDirection = 0;
-                        mDispPlanetType = 1;
+                        mDispPlanetType = DISPPLANETTYPE.HALFHORIZONTAL;
                         drawPlanet(true, new PointD());
                         break;
                     case 4:         //  西面表示
                         mDirection = 6;
-                        mDispPlanetType = 1;
+                        mDispPlanetType = DISPPLANETTYPE.HALFHORIZONTAL;
                         drawPlanet(true, new PointD());
                         break;
                     case 5:         //  全天表示
-                        mDispPlanetType = 2;
+                        mDispPlanetType = DISPPLANETTYPE.FULLHORIZONTAL;
                         drawPlanet(true, new PointD());
                         break;
                     case 6:         //  天球表示
-                        mDispPlanetType = 0;
+                        mDispPlanetType = DISPPLANETTYPE.CELESTIAL;
                         drawPlanet(true, new PointD());
                         break;
                     case 7: {       //  恒星データを表形式で表示
@@ -330,7 +348,7 @@ namespace PlanetApp
                         break;
                     default:        //  北面表示
                         mDirection = 0;
-                        mDispPlanetType = 1;
+                        mDispPlanetType = DISPPLANETTYPE.HALFHORIZONTAL;
                         drawPlanet(true, new PointD());
                         break;
                 }
@@ -348,10 +366,26 @@ namespace PlanetApp
         {
             if (0 <= CbDispFile.SelectedIndex) {
                 mStarDataPath = mDataFileList[CbDispFile.SelectedIndex];
-                Title = Path.GetFileNameWithoutExtension(mStarDataPath);
+                Title = mAppName + " [" + Path.GetFileNameWithoutExtension(mStarDataPath) + "]";
                 loadStarData(mStarDataPath);
                 drawPlanet(true, new PointD());
             }
+        }
+
+        /// <summary>
+        /// 天の川の表示レベル選択
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CbMilkyway_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (0 < CbMilkyway.SelectedIndex) {
+                mMilkywayDispDinsity = ylib.string2int(CbMilkyway.Items[CbMilkyway.SelectedIndex].ToString());
+                mMilkyway = true;
+            } else {
+                mMilkyway = false;
+            }
+            drawPlanet(true, new PointD());
         }
 
         /// <summary>
@@ -492,7 +526,6 @@ namespace PlanetApp
             drawPlanet(false, new PointD());
         }
 
-
         /// <summary>
         /// [左側に回す]ボタン
         /// </summary>
@@ -603,12 +636,14 @@ namespace PlanetApp
             PointD sp = screen2Canvas(e.GetPosition(this));
             PointD offset = sp.vector(mLeftPressPoint);
             if (10.0 < offset.length()) {
+                //  ウィンドウの移動
                 PointD wp = ydraw.cnvScreen2World(sp);
                 PointD woffset = wp.vector(ydraw.cnvScreen2World(mLeftPressPoint));
                 PointD ctr = ydraw.mWorld.getCenter();
-                ctr.Offset(woffset);
+                ydraw.mWorld.offset(woffset);
                 drawPlanet(false, ctr);
             } else {
+                //  データ情報表示
                 StarInfoData.SEARCHDATA searchStar = mStarInfoData.searchPos(sp, 5.0);
                 if (searchStar != null) {
                     //  指定点の恒星情報を表示
@@ -676,7 +711,7 @@ namespace PlanetApp
             int index = CbDispFile.Items.IndexOf(Path.GetFileName(mStarDataPath));
             if (0 <= index) {
                 CbDispFile.SelectedIndex = index;
-                Title = Path.GetFileNameWithoutExtension(mStarDataPath);
+                Title = mAppName + " [" + Path.GetFileNameWithoutExtension(mStarDataPath) + "]";
             }
         }
 
@@ -737,7 +772,7 @@ namespace PlanetApp
             mStarInfoData.mSearchData.Clear();
 
             switch (mDispPlanetType) {
-                case 0:         //  天球表示
+                case DISPPLANETTYPE.CELESTIAL:         //  天球表示
                     drawCelestialBackGround(lst);
                     count = drawCelestialStar();
                     if (mNebulaName)
@@ -747,8 +782,10 @@ namespace PlanetApp
                     if (mConstellaName)
                         drawCelestialConstellaName();
                     break;
-                case 1:         //  半円表示
+                case DISPPLANETTYPE.HALFHORIZONTAL:         //  半円表示
                     drawHorizontalBackGround();
+                    if (mMilkyway)
+                        drawHorizontalMilkyway(lst, localLatitude);
                     count = drawHorizontalStarData(lst, localLatitude);
                     if (mNebulaName)
                         count += drawHorizontalNebula(lst, localLatitude);
@@ -759,8 +796,10 @@ namespace PlanetApp
                     if (mPlanet)
                         drawHorizontalPlanet(lst, localLatitude);
                     break;
-                case 2:         //  全天表示
+                case DISPPLANETTYPE.FULLHORIZONTAL:         //  全天表示
                     drawFullHorizontalBackGround();
+                    if (mMilkyway)
+                        drawHorizontalMilkyway(lst, localLatitude, true);
                     count = drawHorizontalStarData(lst, localLatitude, true);
                     if (mNebulaName)
                         count += drawHorizontalNebula(lst, localLatitude, true);
@@ -783,23 +822,22 @@ namespace PlanetApp
         /// <param name="init">初期化</param>
         /// <param name="cp">中心座標の位置</param>
         /// <param name="zoom">ズーミングスケール</param>
-        private void windowSet(int windowType, bool init, PointD cp, double zoom = 1.0)
+        private void windowSet(DISPPLANETTYPE windowType, bool init, PointD cp, double zoom = 1.0)
         {
             //  Window設定
             if (!init && cp.isEmpty())
                 cp = ydraw.mWorld.getCenter();
 
-            if (init || 
-                (ydraw.mWorld.Width < ydraw.mWorld.Height ? ydraw.mWorld.Width * zoom > mPlanetWindowSize * 1.2 * 2.0 :
-                    ydraw.mWorld.Height * zoom > mPlanetWindowSize * 1.2 * (windowType == 1 ? 1.0 : 2.0) )) {
-                ydraw.setViewArea(0.0, 0.0, Canvas.ActualWidth, Canvas.ActualHeight);
-                ydraw.mAspectFix = true;
-                ydraw.mClipping = true;
-                if (windowType == 0) {              //  全炎(天球面)
+            if (init) {
+                //  View初期化
+                ydraw.setViewArea(0.0, 0.0, Canvas.ActualWidth, Canvas.ActualHeight);   //  Viewの設定
+                ydraw.mAspectFix = true;        //  アスペクト比保持
+                ydraw.mClipping = true;         //  クリッピング可
+                if (windowType == DISPPLANETTYPE.CELESTIAL) {               //  全炎(天球面)
                     ydraw.setWorldWindow(-mPlanetWindowSize, mPlanetWindowSize, mPlanetWindowSize, -mPlanetWindowSize);
-                } else if (windowType == 1) {       //  半円
+                } else if (windowType == DISPPLANETTYPE.HALFHORIZONTAL) {   //  半円
                     ydraw.setWorldWindow(-mPlanetWindowSize, mPlanetWindowSize, mPlanetWindowSize, -mPlanetWindowSize * 0.05);
-                } else if (windowType == 2) {       //  全天
+                } else if (windowType == DISPPLANETTYPE.FULLHORIZONTAL) {   //  全天
                     ydraw.setWorldWindow(-mPlanetWindowSize *1.1, mPlanetWindowSize * 1.1, mPlanetWindowSize * 1.1, -mPlanetWindowSize * 1.1);
                 }
             } else {
@@ -1202,21 +1240,65 @@ namespace PlanetApp
             double jd = ylib.getJD(mDateTime.Year, mDateTime.Month, mDateTime.Day);
             for (int i = 0; i < mPlanetName.Length; i++) { 
                 if (mPlanetName[i].CompareTo("地球") != 0) {
-                    PointD planetPos = plib.equatorialCoordeNate(mPlanetName[i], jd);
+                    PointD planetPos = plib.equatorialCoordinate(mPlanetName[i], jd);   //  赤道座標
                     if (planetPos.isEmpty())
                         continue;
-                    PointD p = convHorizontalPoint(planetPos, lst, localLatitude, full);
+                    PointD p = convHorizontalPoint(planetPos, lst, localLatitude, full);    //  地平座標に変換
                     if (p.isEmpty())
                         continue;
-                    ydraw.mFillColor = mStarFillColor;
+                    //  惑星の表示
+                    ydraw.mFillColor = mPlanetColor[i];
                     ydraw.mBrush = mStarBorderColor;
                     ydraw.drawWCircle(p, ydraw.screen2worldXlength(magnitude2radius(1)));
+                    //  惑星名の表示
                     ydraw.mTextSize = mStarNemeTextSize;
                     ydraw.mTextColor = mStarNameColor;
                     ydraw.drawWText(mPlanetName[i], p);
                 }
             }
+            //  月の表示
+            PointD moonEcliptic = plib.moonEclipticCoordinate(jd);
+            PointD moonEquatorialPos = plib.ecliptic2equatorial(moonEcliptic, ylib.D2R(plib.getEpslion(jd)));
+            PointD mp = convHorizontalPoint(moonEquatorialPos, lst, localLatitude, full);
+            if (!mp.isEmpty()) {
+                ydraw.mFillColor = Brushes.Yellow;
+                ydraw.mBrush = mStarBorderColor;
+                ydraw.drawWCircle(mp, ydraw.screen2worldXlength(magnitude2radius(1)));
+                ydraw.mTextSize = mStarNemeTextSize;
+                ydraw.mTextColor = mStarNameColor;
+                ydraw.drawWText("月", mp);
+            }
         }
+
+        /// <summary>
+        /// 天の川のデータ表示
+        /// </summary>
+        /// <param name="lst">地方恒星時</param>
+        /// <param name="localLatitude">観測点緯度</param>
+        /// <param name="full">全天表示(円/半円)</param>
+        private void drawHorizontalMilkyway(double lst, double localLatitude, bool full = false)
+        {
+            if (mMilkywayData.mMilkywayData == null)
+                return;
+            ydraw.mBrush = Brushes.White;
+            ydraw.mThickness = 1.0;
+            //double ex = ydraw.screen2worldXlength(5);
+            int ex = (int)Math.Max(ydraw.world2screenXlength(0.35), 1.0);
+            //double ex = 0.2;
+            for (int i = 0; i < mMilkywayData.mMilkywayData.Count; i++) {
+                PointD p = convHorizontalPoint(mMilkywayData.mMilkywayData[i].coordinate, lst, localLatitude, full);
+                if (!p.isEmpty() &&
+                    (i % 10 < (mMilkywayDispDinsity / 10))) {           //  配列で間引く
+                    //((100 - mMilkywayDispDinsity) / 2 < mMilkywayData.mMilkywayData[i].density)) {  //  濃度で間引く
+                    ydraw.drawWPoint(p, (int)ex);
+                    //PointD pe = p.toCopy();
+                    //pe.Offset(ex, ex);
+                    //ydraw.drawWLine(p, pe);
+                }
+            }
+
+        }
+
 
         /// <summary>
         /// 恒星データ表示
@@ -1416,12 +1498,20 @@ namespace PlanetApp
         }
 
         /// <summary>
+        /// 天の川データの読込
+        /// </summary>
+        private void loadMilkywayData()
+        {
+            mMilkywayData.loadData();
+        }
+
+        /// <summary>
         /// WikkListのダイヤログ表示
         /// </summary>
         private void wikiListShow()
         {
             mWikiListDialog = new WikiList();
-            mWikiListDialog.Topmost = true;
+            //mWikiListDialog.Topmost = true;
             mWikiListDialog.mMainWindow = this;
             mWikiListDialog.Show();
         }

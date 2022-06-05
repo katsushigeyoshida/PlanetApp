@@ -6,15 +6,15 @@ namespace PlanetApp
     public class PLANETDATA
     {
         //  軌道要素 2000年月1月1.5日(JD=2451545.0) 理科年表2021
-        public string name = "地球";          //  惑星名
-        public double a = 1.0;                  //  軌道長半径 semi-major axis(au)
-        double e = 0.0167;                      //  離心率 eccentricity
-        double i = 0.003 * Math.PI / 180.0;     //  軌道傾斜 orbital inclination (黄道面)(rad)
-        double w = 103.007 * Math.PI / 180.0;   //  ω 近日点黄経 longitude of periheion (rad)
-        double W = 174.821 * Math.PI / 180.0;   //  Ω 昇交点黄経 ascending node (rad)
-        double M0 = 179.912 * Math.PI / 180.0;  //  元期平均近点角(rad)
-        double P = 1.0;                         //  公転周期 orbital period (ユリウス年365.25日))
-        double TT = 2459400.5;                  //  元期(epoch) 2021年7月5日のユリウス日
+        public string name = "地球";                    //  惑星名
+        public double a = 1.0;                          //  軌道長半径 semi-major axis(au)
+        public double e = 0.0167;                       //  離心率 eccentricity
+        public double i = 0.003 * Math.PI / 180.0;      //  軌道傾斜 orbital inclination (黄道面)(rad)
+        public double w = 103.007 * Math.PI / 180.0;    //  π(varpi) 近日点黄経 longitude of periheion (rad)
+        public double W = 174.821 * Math.PI / 180.0;    //  Ω 昇交点黄経 ascending node (rad)
+        public double M0 = 179.912 * Math.PI / 180.0;   //  元期平均近点角(rad)
+        public double P = 1.0;                          //  公転周期 orbital period (ユリウス年365.25日))
+        public double TT = 2459400.5;                   //  元期(epoch) 2021年7月5日のユリウス日
 
         double[,] M = new double[3, 2];
         YLib ylib = new YLib();
@@ -33,6 +33,42 @@ namespace PlanetApp
             //this.w -= this.W;   //  近日点黄経を近日点引数に変換
 
             setMatrixPara();
+        }
+
+        /// <summary>
+        /// ^jdの平均近点角を求めて惑星データを返す
+        /// </summary>
+        /// <param name="jd">ユリウス日</param>
+        /// <returns></returns>
+        public PLANETDATA getPlanetData(double jd = 0.0)
+        {
+            if (jd == 0.0)
+                return new PLANETDATA(name, a, e, ylib.R2D(i), ylib.R2D(w), ylib.R2D(W), ylib.R2D(M0), P, TT);
+            else
+                return new PLANETDATA(name, a, e, ylib.R2D(i), ylib.R2D(w), ylib.R2D(W), ylib.R2D(meanAnomary(jd)), P, jd);
+        }
+
+        /// <summary>
+        /// データのタイトル名
+        /// </summary>
+        /// <returns></returns>
+        public string getTitle()
+        {
+            return "惑星名,軌道半径,離心率,軌道傾斜角,近日点黄経,昇交点黄経,元期平均近点角,公転周期,元期";
+        }
+
+        /// <summary>
+        /// データを文字列に変換
+        /// </summary>
+        /// <param name="jd">ユリウス日</param>
+        /// <returns>文字列</returns>
+        public string ToString(double jd = 0)
+        {
+            double M = jd == 0 ? M0 : meanAnomary(jd);
+            return name + "," + a.ToString("0.####") + "," + e.ToString("0.####") + "," + 
+                ylib.R2D(i).ToString("0.####") + "," + ylib.R2D(w).ToString("0.####") + "," +
+                ylib.R2D(W).ToString("0.####") + "," + ylib.mod(ylib.R2D(M),360.0).ToString("0.####") + "," +
+                P.ToString("0.####") + "," + ylib.JulianDay2DateYear(TT);
         }
 
         /// <summary>
@@ -99,7 +135,7 @@ namespace PlanetApp
         /// <returns>黄道座標</returns>
         public Point3D getPlanetPos(double jd)
         {
-            double M = meanAnomary(jd);
+            //double M = meanAnomary(jd);
             double E = eccentricAnomary(jd);
             PointD op = heriocentricOrbit(E);
 

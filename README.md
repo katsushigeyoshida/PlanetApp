@@ -16,26 +16,26 @@ Web上にある恒星データや理科年表、天文年鑑に載っている�
 
 
 起動画面 (東西南北表示)  
-<img src="Images/MainWindow.png" width="50%">  
+<img src="Images/MainWindow.png" width="80%">  
 
 全天表示  
-<img src="Images/全天表示.png" width="50%">  
+<img src="Images/全天表示.png" width="80%">  
 
 星座早見盤型式の表示  
-<img src="Images/星座早見盤表示.png" width="50%">  
+<img src="Images/星座早見盤表示.png" width="80%">  
 
 恒星データの表示  
-<img src="Images/恒星データ表示.png" width="50%">  
+<img src="Images/恒星データ表示.png" width="90%">  
 
 表示中の恒星データの地平座標の表示  
-<img src="Images/地平座標データ.png" width="50%">  
+<img src="Images/地平座標データ.png" width="90%">  
 
 太陽系惑星の軌道表示  
-<img src="Images/太陽系の惑星表示.png" width="50%">  
+<img src="Images/太陽系の惑星表示.png" width="80%">  
 太陽系の惑星の軌道を地球を中心にして表示  
-<img src="Images/地球中心の太陽系表示.png" width="50%">  
+<img src="Images/地球中心の太陽系表示.png" width="80%">  
 Wikipediaの天体に関する情報の取得と表示  
-<img src="Images/WikiList表示.png" width="50%">  
+<img src="Images/WikiList表示.png" width="90%">  
 
 
 
@@ -46,15 +46,8 @@ https://dotnet.microsoft.com/ja-jp/download/dotnet/thank-you/runtime-6.0.5-windo
 
 ### ■開発環境  
 開発ソフト : Microsoft Visual Studio 2022  
-開発言語　 : C# 9.0 Windows アプリケーション  
+開発言語　 : C# 10.0 Windows アプリケーション  
 フレームワーク　 :  .NET 6.0  
 NuGetライブラリ : なし  
 自作ライブラリ  : CoreLib
 
-・Git 初期化  
-git init  
-git add README.md  
-git commit -m "first commit"  
-git branch -M main  
-git remote add origin https://github.com/katsushigeyoshida/PlanetApp.git  
-git push -u origin main  

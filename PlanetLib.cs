@@ -141,7 +141,7 @@ namespace PlanetApp
         /// <returns>赤道座標(rad)</returns>
         public PointD equatorialCoordinate(string planetName, double jd)
         {
-            double T = (jd - 2451545.0) / 36525;        //  ユリウス世紀
+            double T = (jd - 2451545.0) / 36525;        //  ユリウス世紀(2000年1月1日元期)
 
             //  黄道傾斜角
             double epsilon = (84381.406 - 46.836769 * T - 0.00059 * Math.Pow(T, 2.0) + 0.001813 * Math.Pow(T, 3.0)) / 3600.0;
@@ -158,6 +158,19 @@ namespace PlanetApp
             //  赤道座標に変換
             return ecliptic2equatorial(planetPos.sub(earthPos), epsilon);
         }
+
+        public PointD moonEquatorialCoordinate(double jd)
+        {
+            //  地球の黄道座標
+            PLANETDATA earthData = getPlanetData("地球");
+            Point3D earthPos = earthData.getPlanetPos(jd);
+            //  月の黄道座標
+            PointD moonEcliptic = moonEclipticCoordinate(jd);  //  黄経・黄緯
+
+            PointD moonEquatorialPos = ecliptic2equatorial(moonEcliptic, getEpslion(jd));
+            return moonEquatorialPos;
+        }
+
 
         /// <summary>
         /// 黄道座標を赤道座標に変換
@@ -178,14 +191,20 @@ namespace PlanetApp
         }
 
         /// <summary>
-        /// 地球の自転軸の傾き
+        /// 地球の自転軸の傾き(黄道傾斜角)
         /// </summary>
         /// <param name="jd">ユリウス日</param>
         /// <returns>傾き(rad)</returns>
         public double getEpslion(double jd)
         {
-            double T = (jd - ylib.getJD(1899, 12, 31, 9)) / 365.25;
-            return ylib.D2R(23.452294 - 0.0130125 * T - 0.00000164 * T * T + 0.000000503 * T * T * T);
+            //  黄道傾斜角(IAU基準) https://ja.wikipedia.org/wiki/黄道傾斜角
+            double T = (jd - 2451545.0) / 36525;        //  ユリウス世紀(2000年1月1日元期)
+            return ylib.D2R((84381.406 - 46.836769 * T - 0.00059 * T * T + 0.001813 * T * T * T) / 3600.0);
+            //  歳差を考慮しない時は 84381.406 / 3600 (deg) = 0.409092600600583(rad)
+
+            //  黄道傾斜角 「天体の位置計算増補版」141p
+            //double T = (jd - ylib.getJD(1899, 12, 31, 9)) / 365.25;       //  元期 1900
+            //return ylib.D2R(23.452294 - 0.0130125 * T - 0.00000164 * T * T + 0.000000503 * T * T * T);
         }
 
         /// <summary>
@@ -209,8 +228,7 @@ namespace PlanetApp
 
             if (ra < 0.0)
                 ra += 2.0 * Math.PI;
-            if (dec < 0.0)
-                dec *= -1.0;
+
             return new PointD(ra, dec);
         }
 

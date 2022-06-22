@@ -1257,8 +1257,8 @@ namespace PlanetApp
                 }
             }
             //  月の表示
-            PointD moonEcliptic = plib.moonEclipticCoordinate(jd);
-            PointD moonEquatorialPos = plib.ecliptic2equatorial(moonEcliptic, ylib.D2R(plib.getEpslion(jd)));
+            PointD moonEcliptic = plib.moonEclipticCoordinate(jd);  //  黄経・黄緯
+            PointD moonEquatorialPos = plib.ecliptic2equatorial(moonEcliptic, plib.getEpslion(jd));
             PointD mp = convHorizontalPoint(moonEquatorialPos, lst, localLatitude, full);
             if (!mp.isEmpty()) {
                 ydraw.mFillColor = Brushes.Yellow;

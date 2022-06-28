@@ -1,6 +1,8 @@
 # PlanetApp
 ## シンプルなプラネタリウムソフト
 
+使い方などは[説明書](Document/PlanetAppManual.pdf)を参照。  
+実行方法は[PlanetApp.zip](PlanetApp.zip)をダウンロードし適当なフォルダーに展開して PlanetApp.exe を実行する。  
 #### ■おもな機能
 Web上にある恒星データや理科年表、天文年鑑に載っているデータをもとに恒星や星座、星雲・銀河、惑星を表示する。  
 1) 表示する恒星データの切替  

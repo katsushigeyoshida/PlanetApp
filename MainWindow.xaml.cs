@@ -1237,7 +1237,7 @@ namespace PlanetApp
             ydraw.mTextColor = mConstellaNameColor;
             ydraw.mTextSize = mStarNemeTextSize;
             //  ユリウス日
-            double jd = ylib.getJD(mDateTime.Year, mDateTime.Month, mDateTime.Day);
+            double jd = ylib.getJD(mDateTime.Year, mDateTime.Month, mDateTime.Day, mDateTime.Hour, mDateTime.Minute, mDateTime.Second);
             for (int i = 0; i < mPlanetName.Length; i++) { 
                 if (mPlanetName[i].CompareTo("地球") != 0) {
                     PointD planetPos = plib.equatorialCoordinate(mPlanetName[i], jd);   //  赤道座標

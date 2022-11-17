@@ -389,6 +389,7 @@ namespace PlanetApp
             ydraw.mBrush = Brushes.LightGray;
             ydraw.draw3DWLine(new Point3D(-mSolarSystemSize, 0, 0), new Point3D(mSolarSystemSize, 0, 0));
             ydraw.draw3DWLine(new Point3D(0, -mSolarSystemSize, 0), new Point3D(0, mSolarSystemSize, 0));
+
             //  中心太陽の表示
             ydraw.mBrush = mPtolemaic ? Brushes.Blue : Brushes.Red;
             ydraw.mFillColor = mPtolemaic ? Brushes.Blue : Brushes.Red;

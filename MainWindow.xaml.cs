@@ -278,6 +278,44 @@ namespace PlanetApp
         }
 
         /// <summary>
+        /// [キー入力]処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Window_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Left) {
+                //  方位を左側に移動
+                mDirection -= 0.5;
+                mDirection = mDirection < 0 ? mDirection + 24 : mDirection;
+                drawPlanet(false, new PointD());
+            } else if (e.Key == System.Windows.Input.Key.Right) {
+                //  方位を右側に移動
+                mDirection += 0.5;
+                mDirection = 24 <= mDirection ? mDirection - 24 : mDirection;
+                drawPlanet(false, new PointD());
+            } else if (e.Key == System.Windows.Input.Key.Up) {
+                //  時間を進める
+                mDateTime = mDateTime.AddMinutes(5);
+                setDateMenu();
+                drawPlanet(false, new PointD());
+            } else if (e.Key == System.Windows.Input.Key.Down) {
+                //  時間を戻す
+                mDateTime = mDateTime.AddMinutes(-5);
+                setDateMenu();
+                drawPlanet(false, new PointD());
+            } else if (e.Key == System.Windows.Input.Key.Home) {
+                //  時間を現在時にする
+                mDateTime = DateTime.Now;
+                setDateMenu();
+                drawPlanet(false, new PointD());
+            } else {
+                return;
+            }
+            btLedt.Focus();     //  矢印キーでコンボボックスにフォーカスが移動するのを防ぐ
+        }
+
+        /// <summary>
         /// [メニュー選択]
         /// </summary>
         /// <param name="sender"></param>

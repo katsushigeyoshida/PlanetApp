@@ -45,7 +45,7 @@ namespace PlanetApp
         private PointD mLeftPressPoint = new PointD();          //  マウス左ボタン位置
 
         private PlanetLib plib = new PlanetLib();               //  惑星データ
-        private YWorldDraw ydraw;                               //  グラフィックライブラリ
+        private Y3DDraw ydraw;                               //  グラフィックライブラリ
         private YLib ylib = new YLib();                         //  単なるライブラリ
 
         public SolarSystem()
@@ -55,7 +55,7 @@ namespace PlanetApp
             WindowFormLoad();
 
             //  グラフィックライブラリ
-            ydraw = new YWorldDraw(CvSoloarSystem);
+            ydraw = new Y3DDraw(CvSoloarSystem);
             //  日時の設定
             mDateTime = DateTime.Now;
             //  コンボボックスの設定
@@ -235,6 +235,53 @@ namespace PlanetApp
         }
 
         /// <summary>
+        /// [キー入力]処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Window_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Left) {
+                //  時間を戻す
+                mDateTime = mDateTime.AddDays(-mDateIncrimentSize);
+                DpSolarDate.SelectedDate = mDateTime;
+                drawSolarSystem(false, new PointD());
+            } else if (e.Key == System.Windows.Input.Key.Right) {
+                //  時間を進めろ
+                mDateTime = mDateTime.AddDays(mDateIncrimentSize);
+                DpSolarDate.SelectedDate = mDateTime;
+                drawSolarSystem(false, new PointD());
+            } else if (e.Key == System.Windows.Input.Key.Up) {
+                //  X軸で回転
+                mRoollX += 5;
+                drawSolarSystem(false, new PointD());
+            } else if (e.Key == System.Windows.Input.Key.Down) {
+                //  X軸で回転
+                mRoollX += -5;
+                drawSolarSystem(false, new PointD());
+            } else if (e.Key == System.Windows.Input.Key.PageUp) {
+                //  拡大
+                mSolarSystemSize /= 1.1;
+                drawSolarSystem(false, new PointD());
+            } else if (e.Key == System.Windows.Input.Key.PageDown) {
+                //  縮小
+                mSolarSystemSize *= 1.1;
+                drawSolarSystem(false, new PointD());
+            } else if (e.Key == System.Windows.Input.Key.Home) {
+                //  X軸の回転と時間をリセット
+                mRoollX = 0;
+                mRoollY = 0;
+                mDateTime = DateTime.Now;
+                DpSolarDate.SelectedDate = mDateTime;
+                ptolemaicInit();
+                drawSolarSystem(false, new PointD());
+            } else {
+                return;
+            }
+            BtRollReset.Focus();    //  矢印キーでコンボボックスにフォーカスが移動するのを防ぐ
+        }
+
+        /// <summary>
         /// [表示タイプ]選択
         /// </summary>
         /// <param name="sender"></param>
@@ -377,9 +424,9 @@ namespace PlanetApp
         private void drawBackGround()
         {
             ydraw.clear();
-            ydraw.matrixClear();
-            ydraw.rotateX(ylib.D2R(mRoollX));
-            ydraw.rotateY(ylib.D2R(mRoollY));
+            ydraw.clear3DMatrix();
+            ydraw.setRotateX3DMatrix(ylib.D2R(mRoollX));
+            ydraw.addRotateY3DMatrix(ylib.D2R(mRoollY));
 
             ydraw.mFillColor = mBaseBackColor;
             ydraw.mBrush = Brushes.Black;
@@ -387,8 +434,8 @@ namespace PlanetApp
             ydraw.drawWRectangle(rect);
 
             ydraw.mBrush = Brushes.LightGray;
-            ydraw.draw3DWLine(new Point3D(-mSolarSystemSize, 0, 0), new Point3D(mSolarSystemSize, 0, 0));
-            ydraw.draw3DWLine(new Point3D(0, -mSolarSystemSize, 0), new Point3D(0, mSolarSystemSize, 0));
+            ydraw.draw3DWLine(ydraw.dispConv(new Point3D(-mSolarSystemSize, 0, 0)), ydraw.dispConv(new Point3D(mSolarSystemSize, 0, 0)));
+            ydraw.draw3DWLine(ydraw.dispConv(new Point3D(0, -mSolarSystemSize, 0)), ydraw.dispConv(new Point3D(0, mSolarSystemSize, 0)));
 
             //  中心太陽の表示
             ydraw.mBrush = mPtolemaic ? Brushes.Blue : Brushes.Red;
@@ -442,15 +489,15 @@ namespace PlanetApp
                             ep.offset(op);
                         }
                     }
-                    ydraw.draw3DWLine(sp, ep);
+                    ydraw.draw3DWLine(ydraw.dispConv(sp), ydraw.dispConv(ep));
                     sp = ep;
                 }
-                ydraw.draw3DWLine(sp, ssp);
+                ydraw.draw3DWLine(ydraw.dispConv(sp), ydraw.dispConv(ssp));
 
                 //  惑星位置表示
                 ydraw.mFillColor = (mPtolemaic && j == 2) ? Brushes.Red : mPlanetColor[j];
                 double r = ydraw.screen2worldXlength(4);
-                ydraw.draw3DWCircle(ssp, r);
+                ydraw.draw3DWCircle(ydraw.dispConv(ssp), r);
 
                 mPtlemaicList[j].Add(ssp);      //  軌跡データの登録
 
@@ -459,7 +506,7 @@ namespace PlanetApp
                     ydraw.mBrush = (mPtolemaic && j == 2) ? Brushes.Red : mPlanetColor[j];
                     ydraw.mThickness = 2.0;
                     for (int i = 0; i < mPtlemaicList[j].Count - 1; i++) {
-                        ydraw.draw3DWLine(mPtlemaicList[j][i], mPtlemaicList[j][i + 1]);
+                        ydraw.draw3DWLine(ydraw.dispConv(mPtlemaicList[j][i]), ydraw.dispConv(mPtlemaicList[j][i + 1]));
                     }
                 }
             }

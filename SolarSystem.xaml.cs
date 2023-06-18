@@ -536,7 +536,7 @@ namespace PlanetApp
             PointD p = new PointD(x, y);
             ydraw.drawCircle(p, 5);
             ydraw.mBrush = Brushes.Black;
-            p.Offset(15, -10);
+            p.offset(15, -10);
             ydraw.drawText("太陽", p.toPoint());
             y += 20;
             for (int i = 0; i < mPlanetColor.Length; i++) {
@@ -547,7 +547,7 @@ namespace PlanetApp
                 ydraw.mFillColor = mPlanetColor[i];
                 ydraw.drawCircle(p, 5);
                 ydraw.mBrush = Brushes.Black;
-                p.Offset(15, -10);
+                p.offset(15, -10);
                 ydraw.drawText(mPlanetName[i], p.toPoint());
                 y += 20;
             }
@@ -575,7 +575,7 @@ namespace PlanetApp
         private PointD screen2Canvas(PointD sp)
         {
             PointD offset = new PointD(0.0, SbTopStatusBar.ActualHeight);
-            sp.Offset(-offset.x, -offset.y);
+            sp.offset(-offset.x, -offset.y);
             return sp;
         }
     }

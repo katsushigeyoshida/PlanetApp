@@ -731,7 +731,7 @@ namespace PlanetApp
         {
             //Point offset = new Point(SpLeftPanel.ActualWidth, SbTopStatusBar.ActualHeight);
             PointD offset = new PointD(0.0, SbTopStatusBar.ActualHeight);
-            sp.Offset(-offset.x, -offset.y);
+            sp.offset(-offset.x, -offset.y);
             return sp;
         }
 
@@ -895,7 +895,7 @@ namespace PlanetApp
             ydraw.mThickness = 1.0;
             ydraw.mBrush = mBackGroundBorderColor;
             ydraw.mFillColor = mBackGroundColor;
-            ydraw.drawWCircle(new Point(0, 0), mCelestialRadius);
+            ydraw.drawWCircle(new PointD(0, 0), mCelestialRadius);
 
             //  高度補助線
             double height = Math.PI / 9.0;
@@ -915,13 +915,13 @@ namespace PlanetApp
                     ydraw.mBrush = mScaleTextColor;
                     ydraw.mTextSize = mScaleTextSize;
                     PointD p = alib.cnvFullHorizontal(ylib.H2R(hour), -scaleOffset / 2.0, mDirection, mCelestialRadius);
-                    ydraw.drawWText((hour % 24).ToString("00h"), p, 0.0, HorizontalAlignment.Center, VerticalAlignment.Center);
+                    ydraw.drawWText((hour % 24).ToString("00h"), p, 0, 0, HorizontalAlignment.Center, VerticalAlignment.Center);
                 }
                 if (hour % 6 == 0) {
                     ydraw.mBrush = mScaleTextColor;
                     ydraw.mTextSize = mScaleLargeTextSize;
                     PointD p = alib.cnvFullHorizontal(ylib.H2R(hour), -scaleOffset - largeScaleOffset / 2.0, mDirection, mCelestialRadius);
-                    ydraw.drawWText(mAzimuthName[ylib.mod((int)(hour / 6), 4)], p, 0.0, HorizontalAlignment.Center, VerticalAlignment.Center);
+                    ydraw.drawWText(mAzimuthName[ylib.mod((int)(hour / 6), 4)], p, 0, 0, HorizontalAlignment.Center, VerticalAlignment.Center);
                 }
                 ydraw.mBrush = mScaleOutlineColor;
                 ydraw.drawWLine(alib.cnvFullHorizontal(ylib.H2R(hour), Math.PI / 36.0, mDirection, mCelestialRadius),
@@ -942,16 +942,16 @@ namespace PlanetApp
             ydraw.mThickness = 1.0;
             ydraw.mBrush = mBackGroundBorderColor;
             ydraw.mFillColor = mBackGroundColor;
-            ydraw.drawWCircle(new Point(0, 0), mCelestialRadius);
+            ydraw.drawWCircle(new PointD(0, 0), mCelestialRadius);
 
             //  赤緯の補助線(度)
             for (int i = 50; -90 < i; i -= 40) {
                 double l = alib.declinationLength(ylib.D2R(i), mCelestialRadius);
                 ydraw.mBrush = mAuxLineColor;
-                ydraw.drawWCircle(new Point(0, 0), l);
+                ydraw.drawWCircle(new PointD(0, 0), l);
                 ydraw.mTextSize = mScaleTextSize;
                 ydraw.mBrush = mScaleTextColor;
-                ydraw.drawWText(i.ToString("##°"), new Point(l, 0.0), 0.0, HorizontalAlignment.Center, VerticalAlignment.Bottom);
+                ydraw.drawWText(i.ToString("##°"), new PointD(l, 0.0), 0, 0, HorizontalAlignment.Center, VerticalAlignment.Bottom);
             }
 
             //  赤経の補助線(時)
@@ -963,14 +963,14 @@ namespace PlanetApp
                     //  補助線と目盛り
                     ydraw.mBrush = mScaleTextColor;
                     PointD p = alib.equatorial2orthogonal(new PointD(ylib.H2R(ra), ylib.D2R(-90 * 1.1)), mDirection, mCelestialRadius);
-                    ydraw.drawWText((ra % 24).ToString("00h"), p, 0.0, HorizontalAlignment.Center, VerticalAlignment.Center);
+                    ydraw.drawWText((ra % 24).ToString("00h"), p, 0, 0, HorizontalAlignment.Center, VerticalAlignment.Center);
                     ydraw.mBrush = mAuxLineColor;
-                    ydraw.drawWLine(line.toLine());
+                    ydraw.drawWLine(line);
                 }
                 //  目盛り線
                 ydraw.mBrush = mScaleOutlineColor;
                 line.setLength(mCelestialRadius * 0.05);
-                ydraw.drawWLine(line.toLine());
+                ydraw.drawWLine(line);
             }
 
             //  地平線表示
@@ -987,7 +987,7 @@ namespace PlanetApp
                     //  東西南北表示
                     ydraw.mTextSize = mScaleLargeTextSize;
                     ydraw.mTextColor = mHorizontalTextColor;
-                    ydraw.drawWText(mAzimuthName[(int)(hour / 6) % 4], hps, 0.0, HorizontalAlignment.Center, VerticalAlignment.Center);
+                    ydraw.drawWText(mAzimuthName[(int)(hour / 6) % 4], hps, 0, 0, HorizontalAlignment.Center, VerticalAlignment.Center);
                 }
                 hour += 0.5;
                 azimuth = ylib.H2R(hour);
@@ -1101,8 +1101,8 @@ namespace PlanetApp
             ydraw.mThickness = 1.0;
             ydraw.mBrush = mBackGroundBorderColor;
             ydraw.mFillColor = mBackGroundColor;
-            ydraw.drawWArc(new Point(0, 0), mCelestialRadius, 0.0, Math.PI);
-            ydraw.drawWLine(new Point(mCelestialRadius, 0.0), new Point(-mCelestialRadius, 0.0));
+            ydraw.drawWArc(new PointD(0, 0), mCelestialRadius, 0.0, Math.PI);
+            ydraw.drawWLine(new PointD(mCelestialRadius, 0.0), new PointD(-mCelestialRadius, 0.0));
 
             //  目盛り表示 (経度線)
             double azStep = 1.0;
@@ -1117,7 +1117,7 @@ namespace PlanetApp
                     //  方位を時表示
                     ydraw.mTextSize = mScaleTextSize;
                     ydraw.mTextColor = mScaleTextColor;
-                    ydraw.drawWText((az % 24).ToString("00h"), ps, 0.0, HorizontalAlignment.Center, VerticalAlignment.Top);
+                    ydraw.drawWText((az % 24).ToString("00h"), ps, 0, 0, HorizontalAlignment.Center, VerticalAlignment.Top);
                     //  補助線
                     ydraw.mBrush = mAuxLineColor;
                     PointD p = ps;
@@ -1132,7 +1132,7 @@ namespace PlanetApp
                     ydraw.mTextSize = mScaleLargeTextSize;
                     ydraw.mTextColor = mScaleLargeTextColor;
                     PointD p = new PointD(ps.x, ps.y - ydraw.screen2worldXlength(20));
-                    ydraw.drawWText(mAzimuthName[ylib.mod((int)(az / 6), 4)], p, 0.0, HorizontalAlignment.Center, VerticalAlignment.Top);
+                    ydraw.drawWText(mAzimuthName[ylib.mod((int)(az / 6), 4)], p, 0, 0, HorizontalAlignment.Center, VerticalAlignment.Top);
                 }
                 ydraw.mBrush = mScaleOutlineColor;
                 ydraw.drawWLine(line);
@@ -1146,7 +1146,7 @@ namespace PlanetApp
                 ydraw.mTextSize = mScaleTextSize;
                 ydraw.mTextColor = mScaleTextColor;
                 PointD lp = alib.cnvHorizontal(ylib.H2R(sp), ylib.D2R(lati), mDirection, mCelestialRadius);
-                ydraw.drawWText(lati.ToString("00°"), lp, 0.0, HorizontalAlignment.Right, VerticalAlignment.Center);
+                ydraw.drawWText(lati.ToString("00°"), lp, 0, 0, HorizontalAlignment.Right, VerticalAlignment.Center);
                 //  高度の補助線
                 az = sp;
                 while (az < ep) {
@@ -1322,13 +1322,14 @@ namespace PlanetApp
             ydraw.mThickness = 1.0;
             //double ex = ydraw.screen2worldXlength(5);
             int ex = (int)Math.Max(ydraw.world2screenXlength(0.35), 1.0);
+            ydraw.mPointSize = ex;
             //double ex = 0.2;
             for (int i = 0; i < mMilkywayData.mMilkywayData.Count; i++) {
                 PointD p = convHorizontalPoint(mMilkywayData.mMilkywayData[i].coordinate, lst, localLatitude, full);
                 if (!p.isEmpty() &&
                     (i % 10 < (mMilkywayDispDinsity / 10))) {           //  配列で間引く
                     //((100 - mMilkywayDispDinsity) / 2 < mMilkywayData.mMilkywayData[i].density)) {  //  濃度で間引く
-                    ydraw.drawWPoint(p, (int)ex);
+                    ydraw.drawWPoint(p);
                     //PointD pe = p.toCopy();
                     //pe.Offset(ex, ex);
                     //ydraw.drawWLine(p, pe);

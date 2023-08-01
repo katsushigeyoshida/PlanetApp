@@ -441,7 +441,7 @@ namespace PlanetApp
             ydraw.mBrush = mPtolemaic ? Brushes.Blue : Brushes.Red;
             ydraw.mFillColor = mPtolemaic ? Brushes.Blue : Brushes.Red;
             double r = ydraw.screen2worldXlength(7);
-            ydraw.drawWCircle(new PointD(), r);
+            ydraw.drawWCircle(new PointD(0, 0), r);
         }
 
         /// <summary>

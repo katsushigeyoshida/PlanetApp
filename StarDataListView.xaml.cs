@@ -290,10 +290,12 @@ namespace PlanetApp
         private void setStandardFile()
         {
             if (mStarData.mStarStrData != null && 0 < mStarData.mStarStrData.Count) {
-                InputBox inputDlg = new InputBox();
-                inputDlg.mEditText = mStarData.mStarTableTitle;
-                if (inputDlg.ShowDialog() == true) {
-                    mStarData.saveStandardData(inputDlg.mEditText);
+                InputBox dlg = new InputBox();
+                dlg.Owner = mMainWindow;
+                dlg.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                dlg.mEditText = mStarData.mStarTableTitle;
+                if (dlg.ShowDialog() == true) {
+                    mStarData.saveStandardData(dlg.mEditText);
                 }
             }
         }

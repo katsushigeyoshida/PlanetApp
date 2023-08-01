@@ -692,6 +692,8 @@ namespace PlanetApp
         private void messageBox(string buf, string title)
         {
             InputBox dlg = new InputBox();
+            dlg.Owner = mMainWindow;
+            dlg.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             dlg.Title = title;
             dlg.mWindowSizeOutSet = true;
             dlg.mWindowWidth = 500.0;

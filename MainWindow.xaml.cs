@@ -678,7 +678,7 @@ namespace PlanetApp
                 PointD wp = ydraw.cnvScreen2World(sp);
                 PointD woffset = wp.vector(ydraw.cnvScreen2World(mLeftPressPoint));
                 PointD ctr = ydraw.mWorld.getCenter();
-                ydraw.mWorld.offset(woffset);
+                ydraw.setWorldOffset(woffset);
                 drawPlanet(false, ctr);
             } else {
                 //  データ情報表示
@@ -863,7 +863,7 @@ namespace PlanetApp
         private void windowSet(DISPPLANETTYPE windowType, bool init, PointD cp, double zoom = 1.0)
         {
             //  Window設定
-            if (!init && cp.isEmpty())
+            if (!init && (cp.isEmpty() || cp.isNaN()))
                 cp = ydraw.mWorld.getCenter();
 
             if (init) {
@@ -879,7 +879,7 @@ namespace PlanetApp
                     ydraw.setWorldWindow(-mPlanetWindowSize *1.1, mPlanetWindowSize * 1.1, mPlanetWindowSize * 1.1, -mPlanetWindowSize * 1.1);
                 }
             } else {
-                ydraw.mWorld.zoom(cp, zoom);
+                ydraw.setWorldZoom(cp, zoom);
             }
         }
 
@@ -902,7 +902,7 @@ namespace PlanetApp
             ydraw.mFillColor = null;
             ydraw.mBrush = mAuxLineColor;
             while (height < Math.PI / 2) {
-                ydraw.drawWCircle(new PointD(), mCelestialRadius * (1.0 - height / (Math.PI / 2.0)));
+                ydraw.drawWCircle(new PointD(0, 0), mCelestialRadius * (1.0 - height / (Math.PI / 2.0)));
                 height += Math.PI / 9.0;
             }
             //  方位補助線
@@ -911,7 +911,7 @@ namespace PlanetApp
             for (int hour = 0; hour < 24; hour++) {
                 if (hour % 2 == 0) {
                     ydraw.mBrush = mAuxLineColor;
-                    ydraw.drawWLine(new PointD(), alib.cnvFullHorizontal(ylib.H2R(hour), 0.0, mDirection, mCelestialRadius));
+                    ydraw.drawWLine(new PointD(0, 0), alib.cnvFullHorizontal(ylib.H2R(hour), 0.0, mDirection, mCelestialRadius));
                     ydraw.mBrush = mScaleTextColor;
                     ydraw.mTextSize = mScaleTextSize;
                     PointD p = alib.cnvFullHorizontal(ylib.H2R(hour), -scaleOffset / 2.0, mDirection, mCelestialRadius);
@@ -1175,7 +1175,7 @@ namespace PlanetApp
             ydraw.mTextSize = mStarNemeTextSize;
             foreach (StarData.STARDATA star in mStarData.mStarData) {
                 PointD p = convHorizontalPoint(star.coordinate, lst, localLatitude, full);
-                if (!p.isEmpty()) {
+                if (!p.isEmpty() && !p.isNaN()) {
                     if (p.length() < mCelestialRadius && (mStarLevelMag == 0 || star.magnitude < mStarLevelMag)) {
                         drawStar(p, star);
                         count++;
@@ -1204,7 +1204,7 @@ namespace PlanetApp
             ydraw.mTextSize = mStarNemeTextSize;
             foreach (NebulaData.NEBULADATA nebula in mNebulaData.mNebulaData) {
                 PointD p = convHorizontalPoint(nebula.coordinate, lst, localLatitude, full);
-                if (!p.isEmpty()) {
+                if (!p.isEmpty() && !p.isNaN()) {
                     if (p.length() < mCelestialRadius && (mStarLevelMag == 0 || nebula.magnitude < mStarLevelMag)) {
                         drawNebula(p, nebula);
                         count++;
@@ -1237,7 +1237,7 @@ namespace PlanetApp
                 ConstellationData.CONSTELLATIONSTAR eStar = mConstellationData.mConstellaStarList[costellaLine.eHip];
                 PointD sp = convHorizontalPoint(sStar.coordinate, lst, localLatitude, full);
                 PointD ep = convHorizontalPoint(eStar.coordinate, lst, localLatitude, full);
-                if (!sp.isEmpty() && !ep.isEmpty()) {
+                if (!sp.isEmpty() && !ep.isEmpty() && !sp.isNaN() && !ep.isNaN()) {
                     ydraw.drawWLine(sp, ep);
                 }
             }
@@ -1258,7 +1258,7 @@ namespace PlanetApp
             ydraw.mTextSize = mStarNemeTextSize;
             foreach (ConstellationData.CONSTELLATIONNAME constellaName in mConstellationData.mConstellaNameList) {
                 PointD p = convHorizontalPoint(constellaName.coordinate, lst, localLatitude, full);
-                if (!p.isEmpty()) {
+                if (!p.isEmpty() && !p.isNaN()) {
                     drawConstellaName(p, constellaName);
                 }
             }
@@ -1279,10 +1279,10 @@ namespace PlanetApp
             for (int i = 0; i < mPlanetName.Length; i++) { 
                 if (mPlanetName[i].CompareTo("地球") != 0) {
                     PointD planetPos = plib.equatorialCoordinate(mPlanetName[i], jd);   //  赤道座標
-                    if (planetPos.isEmpty())
+                    if (planetPos.isEmpty() || planetPos.isNaN())
                         continue;
                     PointD p = convHorizontalPoint(planetPos, lst, localLatitude, full);    //  地平座標に変換
-                    if (p.isEmpty())
+                    if (p.isEmpty() || p.isNaN())
                         continue;
                     //  惑星の表示
                     ydraw.mFillColor = mPlanetColor[i];
@@ -1298,7 +1298,7 @@ namespace PlanetApp
             PointD moonEcliptic = plib.moonEclipticCoordinate(jd);  //  黄経・黄緯
             PointD moonEquatorialPos = plib.ecliptic2equatorial(moonEcliptic, plib.getEpslion(jd));
             PointD mp = convHorizontalPoint(moonEquatorialPos, lst, localLatitude, full);
-            if (!mp.isEmpty()) {
+            if (!mp.isEmpty() && !mp.isNaN()) {
                 ydraw.mFillColor = Brushes.Yellow;
                 ydraw.mBrush = mStarBorderColor;
                 ydraw.drawWCircle(mp, ydraw.screen2worldXlength(magnitude2radius(1)));
@@ -1326,7 +1326,7 @@ namespace PlanetApp
             //double ex = 0.2;
             for (int i = 0; i < mMilkywayData.mMilkywayData.Count; i++) {
                 PointD p = convHorizontalPoint(mMilkywayData.mMilkywayData[i].coordinate, lst, localLatitude, full);
-                if (!p.isEmpty() &&
+                if (!p.isEmpty() && !p.isNaN() &&
                     (i % 10 < (mMilkywayDispDinsity / 10))) {           //  配列で間引く
                     //((100 - mMilkywayDispDinsity) / 2 < mMilkywayData.mMilkywayData[i].density)) {  //  濃度で間引く
                     ydraw.drawWPoint(p);
@@ -1440,7 +1440,7 @@ namespace PlanetApp
             double height = alib.horizonHeight(hourAngle, coordinate.y, localLatitude); //  高さ
             double azimuth = alib.horizonAzimuth(hourAngle, coordinate.y, localLatitude);//  方位
 
-            PointD p = new PointD();
+            PointD p = new PointD(0, 0);
             double sp = (mDirection - 6 + 24) % 24.0;               //  方位の表示開始角度(常に正の値))
             double hazimuth = (ylib.R2H(azimuth) - sp + 24)  % 24;  //  表示開始位置と星の位置の方位差)
             if (0 < height && (full || (0 < hazimuth && hazimuth < 12))) {
